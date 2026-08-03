@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # 1. Récupération du code source
+    # 1. Récupération du code source (inclut ton dossier prebuilt-librosco)
     - name: Checkout repository
       uses: actions/checkout@v4
 
@@ -29,30 +29,22 @@ jobs:
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
 
-    # 4. Cloner et compiler librosco
-    - name: Download and Build librosco
-      run: |
-        git clone https://github.com/ColinBourge/librosco.git librosco_src
-        cmake -B librosco_src/build -S librosco_src -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/rosco_install"
-        cmake --build librosco_src/build --config Release
-        cmake --install librosco_src/build --config Release
-
-    # 5. Configuration de ton projet principal avec CMake
+    # 4. Configuration avec CMake (pointé vers ton dossier prebuilt)
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/rosco_install"
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prebuilt-librosco"
 
-    # 6. Compilation de ton projet principal
+    # 5. Compilation du projet
     - name: Build Application
       run: cmake --build build --config Release
 
-    # 7. Déploiement des DLLs Qt ET copie de la DLL librosco
+    # 6. Déploiement des DLLs Qt ET copie de ta DLL depuis prebuilt-librosco
     - name: Deploy Qt DLLs and librosco
       run: |
         windeployqt build/Release/ecu_mems_manager.exe
-        Copy-Item -Path "${{ github.workspace }}/rosco_install/bin/librosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
-        Copy-Item -Path "${{ github.workspace }}/rosco_install/bin/rosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
+        Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/librosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
+        Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/rosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
 
-    # 8. Sauvegarde de l'exécutable et des DLLs pour le téléchargement
+    # 7. Sauvegarde du résultat téléchargeable sur GitHub
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:

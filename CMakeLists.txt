@@ -66,12 +66,12 @@ set (SOURCES
 
 # Déclaration de l'exécutable
 add_executable (${PNAME} ${SOURCES})
-  if (MSVC)
-  # Empêche MSVC d'échouer sur 'stdext' dans les headers Qt 5.15
+
+# Correctif MSVC pour la compatibilité avec Qt 5.15 et les en-têtes STL
+if (MSVC)
     add_compile_definitions(_HAS_STD_BYTE=0)
-    add_compile_options(/permissive)
-    target_compile_options(${PNAME} PRIVATE /permissive-)
-  endif()
+    target_compile_options(${PNAME} PRIVATE /permissive)
+endif()
 
 # --- CONFIGURATION SELON LE SYSTÈME D'EXPLOITATION ---
 

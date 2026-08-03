@@ -18,7 +18,7 @@ jobs:
 
     # 2. Installation de Qt pour Windows (MSVC)
     - name: Install Qt
-      uses: jurplel/install-qt@v3
+      uses: jurplel/install-qt-action@v3
       with:
         version: '5.15.2' # Modifiez si votre projet utilise Qt6 (ex: '6.5.0')
         host: 'windows'

@@ -59,7 +59,7 @@ set(SOURCES
   
   # --- Fichiers d'interface utilisateur (.ui) ---
   # CMAKE_AUTOUIC générera automatiquement ui_memsinterface.h, ui_mainwindow.h, etc.
-  memsinterface.ui
+  memsinterface
   mainwindow.ui
   aboutbox.ui
   optionsdialog.ui

@@ -66,6 +66,9 @@ set (SOURCES
 
 # Déclaration de l'exécutable
 add_executable (${PNAME} ${SOURCES})
+  if (MSVC)
+    target_compile_options(${PNAME} PRIVATE /permissive-)
+  endif()
 
 # --- CONFIGURATION SELON LE SYSTÈME D'EXPLOITATION ---
 

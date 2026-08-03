@@ -1,2 +1,3 @@
-# ECU-Mems-Manager
-Outils de réglages et d'analyse pour Rover SPI
+# ECU Mems Manager
+
+Alpha2 base.

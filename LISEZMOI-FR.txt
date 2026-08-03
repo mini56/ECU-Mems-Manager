@@ -1,0 +1,57 @@
+MEMS-Scan - Version française (traduction non officielle)
+============================================================
+
+Traduction française complète de MEMS-Scan par "haro78"
+(https://github.com/haro78/MEMS-Scan), basé sur MEMSGauge et MEMS-rosco,
+sous licence GPL v3. Traduction non officielle, non affiliée à l'auteur.
+
+Tout le texte visible a été traduit : les 7 onglets (Aperçu, Réglages,
+toutes les mesures, Erreurs, Actionneurs, Toutes les données, mode
+interactif), les menus, boutons, messages d'erreur, bulles d'aide
+détaillées, et le fichier d'aide intégré.
+
+COMPILATION AUTOMATIQUE VIA GITHUB ACTIONS (recommandé)
+----------------------------------------------------------
+Ce dossier contient déjà tout le nécessaire, y compris VOTRE fichier
+librosco.dll (dans prebuilt-librosco/), garanti compatible puisque
+c'est celui qui faisait déjà tourner votre logiciel.
+
+Étapes (identiques à la procédure qu'on a suivie ensemble) :
+1. Créez un NOUVEAU dépôt GitHub public et vide (par ex. "MEMS-Scan-fr")
+   - Ne pas réutiliser l'ancien dépôt "Mems-fr", pour éviter tout
+     mélange avec les fichiers de MEMSGauge.
+2. Uploadez tout le contenu de ce dossier "MEMS-Scan" (Add file >
+   Upload files), y compris le sous-dossier caché .github et le
+   sous-dossier prebuilt-librosco. Si .github n'apparaît pas dans
+   votre sélection de fichiers, créez-le manuellement comme la
+   dernière fois : "Add file" > "Create new file" >
+   .github/workflows/build-windows.yml, puis collez le contenu de
+   ce fichier.
+3. Onglet "Actions" > le workflow "Compilation Windows (MEMS-Scan FR)"
+   se lance automatiquement (ou "Run workflow" si besoin).
+4. Une fois terminé (coche verte), ouvrez l'exécution, descendez à
+   "Artifacts", téléchargez "MEMS-Scan-FR-Windows".
+5. Décompressez et lancez mems-scan.exe - tout est inclus.
+
+Je n'ai pas pu tester ce workflow de bout en bout moi-même (pas d'accès
+à un vrai runner Windows), mais j'ai vérifié que tout le code traduit
+compile sans erreur en local. S'il y a un souci dans l'onglet Actions,
+copiez-moi le message d'erreur affiché et je corrigerai le fichier .yml,
+exactement comme on l'a fait pour la première traduction.
+
+CE QUI A ÉTÉ TRADUIT
+--------------------
+- mainwindow.ui : 523 chaînes (318 uniques), les 7 onglets complets
+- mainwindow.cpp, aboutbox.cpp, optionsdialog.cpp, helpviewer.cpp :
+  messages d'erreur et labels dynamiques
+- help.html.in : documentation d'aide intégrée, adaptée au contenu
+  réel de ce logiciel (réglages, 24 erreurs, actionneurs, etc.)
+
+CORRECTIONS APPORTÉES (bugs préexistants, sans rapport avec la
+traduction)
+------------------------------------------------------------------
+- Suppression de fichiers de compilation Windows accidentellement
+  commités par l'auteur original (CMakeCache.txt, etc.) qui auraient
+  perturbé toute nouvelle compilation.
+- Ajout de l'en-tête manquant <cmath> dans mainwindow.cpp (nécessaire
+  pour la fonction round(), absent dans le code d'origine).

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+<title>Documentation MEMS-Scan</title>
+<style media="screen" type="text/css">
+    body {
+        background: #FFF8E0;
+        color: #000000;
+        font-family: verdana,sans;
+    }
+    ul li {
+        margin: 0 10px 10px 0;
+        vertical-align:top
+    }
+</style>
+</head>
+<body>
+    <h3>Présentation</h3>
+    <p>MEMS-Scan est un utilitaire logiciel destiné au diagnostic et au test du Rover Modular Engine Management System (MEMS). Actuellement, seul le MEMS 1.6 est pris en charge, reconnaissable à sa prise de diagnostic ronde à trois broches, généralement située dans le compartiment moteur près de la cloison pare-feu.</p>
+    <p><b>MEMS-Scan s'appuie sur le travail de MEMSgauge de Colin et de MEMS-rosco de Leopold. La communication repose sur la bibliothèque librosco, spécifiquement adaptée pour MEMS-Scan. Je remercie Colin, Leopold, Alan, Andy et Martin pour leurs contributions et retours. Haro</p>
+    <p>Tous les véhicules équipés du MEMS 1.3, 1.6 ou 1.9 n'utilisent pas le même ensemble de capteurs et d'actionneurs. MEMS-Scan a été testé sur une Mini SPi 1.3 ; certaines fonctionnalités du logiciel ne sont pas utilisées sur ce véhicule. Si vous souhaitez contribuer et possédez un moteur MEMS 1.6 avec turbo, boîte automatique, climatisation ou d'autres équipements absents sur la Mini SPi, merci de me contacter.</p>
+    <h3>Câble d'interface</h3>
+    <p>Pour communiquer avec l'ECU MEMS, MEMS-Scan nécessite un câble d'interface spécial. Les informations pour le fabriquer se trouvent <a href="https://github.com/colinbourassa/librosco/blob/wiki/HardwareInterface.md">ici</a>.</p>
+    <p>En résumé : le câble doit être basé sur un convertisseur série USB 5V (TTL). Le FTDI TTL-232R-5V est recommandé. Le connecteur requis est le TE Connectivity 172201, à équiper de trois broches TE Connectivity 170280.</p>
+    <p>En regardant la face du connecteur avec le détrompeur (l'encoche) en bas, la broche 1 se trouve en haut. La numérotation se poursuit dans le sens horaire. La broche 1 doit être reliée au fil GND (noir) du câble FTDI. La broche 2 se connecte au fil RxD (jaune) du FTDI, et la broche 3 au fil TxD (orange). Les autres fils du FTDI ne sont pas utilisés ; ils doivent être coupés et isolés.</p>
+    <h3>Liens utiles :</h3>
+	<p><a href="http://alum.wpi.edu/~colinb/rover-mems-16-diagnostic-protocol.html">Protocole de diagnostic Rover MEMS 1.6 par Colin</a>
+	<p><a href="https://blackbox-solutions.com/help/SM002.html">Informations de diagnostic Rover MEMS 1.6/1.9</a>
+	<p><a href="https://groups.google.com/forum/?pli=1#!forum/mems-diagnostics">Groupe de discussion Google sur le diagnostic MEMS</a>
+	<h3>Fonctionnalités</h3>
+    <p><b>Paramètres :</b> Les jauges de température et de pression collecteur peuvent être changées d'unité via "Modifier les paramètres" dans le menu "Options".</p>
+    <p><b>ID ECU :</b> Affiche, en hexadécimal, la réponse de l'ECU à la commande 0xD0, envoyée lors de l'initialisation de la liaison série. Si vous disposez d'informations sur la signification de cette réponse de quatre octets, merci de les transmettre à l'auteur.</p>
+    <p><b>Communications :</b> Indicateurs d'état ; vert quand la liaison série fonctionne, rouge en cas de problème.
+	<p><b>Erreurs ECU :</b> Indicateur rouge si des erreurs sont présentes dans l'ECU.
+	<p><b>Aperçu :</b> Les paramètres les plus importants sont affichés dans cet onglet. Il permet aussi de démarrer et d'arrêter l'enregistrement.
+	<p><b>Réglages :</b> Plusieurs paramètres de l'ECU peuvent être ajustés manuellement, ou une réinitialisation complète de l'ECU peut être effectuée. Avant tout réglage, il est fortement recommandé de noter les valeurs actuelles afin de pouvoir toujours revenir aux réglages initiaux. La réinitialisation automatique de tous les réglages aux valeurs d'usine n'est pas (encore) possible.
+	<p><b>Erreurs :</b> Un total de 24 erreurs possibles enregistrées par l'ECU sont affichées. Toutes ne sont pas connues, mais toutes peuvent être effacées. Un indicateur vert s'allume également en présence d'un signal du capteur régime/PMH. Enfin, certains indicateurs signalent des anomalies. Ces anomalies ne sont PAS enregistrées par l'ECU, mais MEMS-Scan considère ces valeurs comme inhabituelles. Elles ne sont donc visibles/enregistrées que lorsque MEMS-Scan est connecté, et disparaissent à la déconnexion.
+	<p><b>Actionneurs :</b> Pour la sécurité du moteur, les tests d'actionneurs ne sont disponibles que lorsque le moteur est arrêté. Notez que tous les véhicules ne sont pas équipés de tous les actionneurs pour lesquels des fonctions de test sont proposées.</p>
+    <p><b>Toutes les données :</b> Affiche toutes les données reçues de l'ECU en réponse aux commandes 0x7D et 0x80. Une description est fournie quand elle est connue, et la réponse est interprétée si possible.</p>
+	<p></p>
+	<p><b><i>Remarque :</b><i> Les tests montrent que la position finale du moteur pas-à-pas de régulation d'air ne correspond parfois pas exactement à la position commandée. Si l'écart dépasse 1%, il est conseillé de sélectionner un "Latency Timer" plus élevé dans les paramètres avancés du port COM utilisé</i></p>
+    
+
+</body>
+</html>
+

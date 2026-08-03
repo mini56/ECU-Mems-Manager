@@ -31,7 +31,7 @@ jobs:
 
     # 4. Configuration avec CMake
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
     # 5. Compilation du projet
     - name: Build Application

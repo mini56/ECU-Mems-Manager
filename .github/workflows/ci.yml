@@ -29,20 +29,30 @@ jobs:
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
 
-    # 4. Configuration avec CMake
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+    # 4. Cloner et compiler librosco
+    - name: Download and Build librosco
+      run: |
+        git clone https://github.com/ColinBourge/librosco.git librosco_src
+        cmake -B librosco_src/build -S librosco_src -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}/rosco_install"
+        cmake --build librosco_src/build --config Release
+        cmake --install librosco_src/build --config Release
 
-    # 5. Compilation du projet
+    # 5. Configuration de ton projet principal avec CMake
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/rosco_install"
+
+    # 6. Compilation de ton projet principal
     - name: Build Application
       run: cmake --build build --config Release
 
-    # 6. Déploiement des DLLs Qt à côté de l'exécutable (.exe)
-    - name: Deploy Qt DLLs
+    # 7. Déploiement des DLLs Qt ET copie de la DLL librosco
+    - name: Deploy Qt DLLs and librosco
       run: |
         windeployqt build/Release/ecu_mems_manager.exe
+        Copy-Item -Path "${{ github.workspace }}/rosco_install/bin/librosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
+        Copy-Item -Path "${{ github.workspace }}/rosco_install/bin/rosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
 
-    # 7. Sauvegarde du résultat téléchargeable sur GitHub
+    # 8. Sauvegarde de l'exécutable et des DLLs pour le téléchargement
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:

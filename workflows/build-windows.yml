@@ -1,83 +1,51 @@
-name: Compilation Windows (MEMS-Scan FR)
+name: Build Mems-Scan (Windows)
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
 
 jobs:
   build-windows:
+    name: Build sur Windows
     runs-on: windows-latest
+
     steps:
-      - name: Récupérer le code de MEMS-Scan (ce dépôt)
-        uses: actions/checkout@v4
+    # 1. Récupération du code source
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Installer Python (nécessaire pour aqtinstall)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    # 2. Installation de Qt pour Windows (MSVC)
+    - name: Install Qt
+      uses: jurplel/install-qt@v3
+      with:
+        version: '5.15.2' # Modifiez si votre projet utilise Qt6 (ex: '6.5.0')
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
 
-      - name: Installer aqtinstall (outil officiel de récupération de Qt)
-        run: pip install aqtinstall
+    # 3. Configuration de l'environnement MSVC (compilateur C++)
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Installer Qt 5.15.2 MinGW 32 bits (correspond à votre librosco.dll)
-        run: |
-          aqt install-qt windows desktop 5.15.2 win32_mingw81 -O C:\Qt
-          aqt install-tool windows desktop tools_mingw qt.tools.win32_mingw810 -O C:\Qt
+    # 4. Configuration avec CMake
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Installer librosco (DLL déjà fournie) au chemin attendu
-        shell: cmd
-        run: |
-          mkdir C:\mems-rosco\include
-          copy rosco.h C:\mems-rosco\include\rosco.h
-          copy prebuilt-librosco\librosco.dll C:\mems-rosco\librosco.dll
+    # 5. Compilation du projet
+    - name: Build Application
+      run: cmake --build build --config Release
 
-      - name: Installer zlib1.dll (DLL déjà fournie) au chemin attendu par CMake
-        shell: cmd
-        run: |
-          copy prebuilt-zlib\zlib1.dll "C:\Qt\5.15.2\mingw81_32\bin\zlib1.dll"
+    # 6. Déploiement des DLLs Qt (windeployqt)
+    # Nécessaire pour que le .exe fonctionne en double-cliquant dessus
+    - name: Deploy Qt Libraries
+      run: |
+        windeployqt build/Release/
 
-      - name: Compiler MEMS-Scan (version française)
-        shell: cmd
-        run: |
-          set PATH=C:\Qt\5.15.2\mingw81_32\bin;C:\Qt\Tools\mingw810_32\bin;C:\Qt\5.15.2\mingw81_32\plugins\platforms;C:\Program Files\CMake\bin;C:\Windows\System32;C:\Windows
-          mkdir build
-          cd build
-          cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
-          mingw32-make -j4
-          
-      - name: Rassembler MEMS-Scan Windows
-        shell: cmd
-        run: |
-          mkdir C:\mems-scan
-
-          copy build\mems-scan.exe C:\mems-scan\
-          copy C:\mems-rosco\librosco.dll C:\mems-scan\
-          copy prebuilt-zlib\zlib1.dll C:\mems-scan\
-
-          copy C:\Qt\5.15.2\mingw81_32\bin\Qt5Core.dll C:\mems-scan\
-          copy C:\Qt\5.15.2\mingw81_32\bin\Qt5Gui.dll C:\mems-scan\
-          copy C:\Qt\5.15.2\mingw81_32\bin\Qt5Widgets.dll C:\mems-scan\
-
-          echo Recherche libstdc++
-          dir C:\Qt\Tools\mingw810_32\bin\libstdc++-6.dll
-
-          echo Copie DLL MinGW
-          copy /Y "C:\Qt\Tools\mingw810_32\bin\libstdc++-6.dll" "C:\mems-scan\"
-          copy /Y "C:\Qt\Tools\mingw810_32\bin\libgcc_s_dw2-1.dll" "C:\mems-scan\"
-          copy /Y "C:\Qt\Tools\mingw810_32\bin\libwinpthread-1.dll" "C:\mems-scan\"
-
-          echo Verification apres copie
-          dir C:\mems-scan\*.dll
-
-          echo Contenu final du dossier
-          dir C:\mems-scan
-
-          mkdir C:\mems-scan\platforms
-          copy C:\Qt\5.15.2\mingw81_32\plugins\platforms\qwindows.dll C:\mems-scan\platforms\
-
-      - name: Publier le paquet Windows prêt à l'emploi
-        uses: actions/upload-artifact@v4
-        with:
-          name: MEMS-Scan-FR-Windows
-          path: C:/mems-scan/**
+    # 7. Sauvegarde de l'exécutable et des DLLs
+    - name: Upload Windows Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: mems-scan-windows
+        path: build/Release/

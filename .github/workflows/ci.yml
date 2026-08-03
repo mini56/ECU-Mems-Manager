@@ -1,4 +1,4 @@
-name: Build Mems-Scan (Windows)
+name: Build ECU Mems Manager (Windows)
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build sur Windows
+    name: Build Windows (MSVC)
     runs-on: windows-latest
 
     steps:
@@ -16,36 +16,35 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. Installation de Qt pour Windows (MSVC)
+    # 2. Installation des bibliothèques Qt 5
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
       with:
-        version: '5.15.2' # Modifiez si votre projet utilise Qt6 (ex: '6.5.0')
+        version: '5.15.2'
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
 
-    # 3. Configuration de l'environnement MSVC (compilateur C++)
+    # 3. Configuration des outils de compilation Microsoft (MSVC)
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
 
     # 4. Configuration avec CMake
     - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
     # 5. Compilation du projet
     - name: Build Application
       run: cmake --build build --config Release
 
-    # 6. Déploiement des DLLs Qt (windeployqt)
-    # Nécessaire pour que le .exe fonctionne en double-cliquant dessus
-    - name: Deploy Qt Libraries
+    # 6. Déploiement des DLLs Qt à côté de l'exécutable (.exe)
+    - name: Deploy Qt DLLs
       run: |
-        windeployqt build/Release/
+        windeployqt build/Release/ecu_mems_manager.exe
 
-    # 7. Sauvegarde de l'exécutable et des DLLs
-    - name: Upload Windows Artifact
+    # 7. Sauvegarde du résultat téléchargeable sur GitHub
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: mems-scan-windows
+        name: ECU-Mems-Manager-Windows
         path: build/Release/

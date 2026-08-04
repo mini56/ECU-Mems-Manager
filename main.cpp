@@ -6,7 +6,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QtMath>
-#include "mainwindow.h"
+#include "memsinterface.h"
 #include "splashprogress.h"
 #include <QtPlugin>
 
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     "}"
   );
 
-  MainWindow w;
+  MEMSInterface w;
 
   g_splashProgressCallback = 0;
   refreshTimer.stop();

@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MEMSInterface</class>
+ <widget class="QMainWindow" name="MEMSInterface">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>900</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MEMS Diagnostic Interface</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <item>
+     <layout class="QHBoxLayout" name="connectionLayout">
+      <item>
+       <widget class="QLabel" name="comPortLabel">
+        <property name="text">
+         <string>Port :</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="m_ComPortComboBox"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_ConnectButton">
+        <property name="text">
+         <string>Connecter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_DisconnectButton">
+        <property name="text">
+         <string>Déconnecter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="m_StatusLabel">
+        <property name="text">
+         <string>Déconnecté</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="connectionSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="streamLayout">
+      <item>
+       <widget class="QPushButton" name="m_StartStreamButton">
+        <property name="text">
+         <string>Démarrer le flux</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_StopStreamButton">
+        <property name="text">
+         <string>Arrêter le flux</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_ClearFaultsButton">
+        <property name="text">
+         <string>Effacer les défauts</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="m_SnapshotButton">
+        <property name="text">
+         <string>Capture d'écran</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="liveDataGroup">
+      <property name="title">
+       <string>Données temps réel</string>
+      </property>
+      <layout class="QFormLayout" name="liveDataLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="rpmCaption">
+         <property name="text">
+          <string>Régime (tr/min) :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="m_RpmLabel">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="coolantCaption">
+         <property name="text">
+          <string>Temp. liquide de refroidissement :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="m_CoolantTempLabel">
+         <property name="text">
+          <string>0 °C</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="intakeCaption">
+         <property name="text">
+          <string>Temp. air admission :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="m_IntakeTempLabel">
+         <property name="text">
+          <string>0 °C</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="batteryCaption">
+         <property name="text">
+          <string>Tension batterie :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="m_BatteryVoltLabel">
+         <property name="text">
+          <string>0 V</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="mapCaption">
+         <property name="text">
+          <string>Pression collecteur (MAP) :</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="m_MapLabel">
+         <property name="text">
+          <string>0 KPa</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="graphWidget" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>180</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="actuatorGroup">
+      <property name="title">
+       <string>Test des actionneurs</string>
+      </property>
+      <layout class="QGridLayout" name="actuatorLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="fuelPumpCaption">
+         <property name="text">
+          <string>Pompe à carburant</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="m_FuelPump_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="m_FuelPump_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="ptcRelayCaption">
+         <property name="text">
+          <string>Relais PTC</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="m_PTC_Relay_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="QPushButton" name="m_PTC_Relay_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="acRelayCaption">
+         <property name="text">
+          <string>Relais climatisation</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="m_AC_Relay_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="m_AC_Relay_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="purgeValveCaption">
+         <property name="text">
+          <string>Électrovanne de purge</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QPushButton" name="m_Purge_Valve_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QPushButton" name="m_Purge_Valve_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="o2HeaterCaption">
+         <property name="text">
+          <string>Chauffage sonde O2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QPushButton" name="m_O2_Heater_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QPushButton" name="m_O2_Heater_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="boostValveCaption">
+         <property name="text">
+          <string>Vanne de suralimentation</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QPushButton" name="m_Boost_Valve_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QPushButton" name="m_Boost_Valve_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="fan1Caption">
+         <property name="text">
+          <string>Ventilateur 1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QPushButton" name="m_Fan1_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="QPushButton" name="m_Fan1_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="fan2Caption">
+         <property name="text">
+          <string>Ventilateur 2</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QPushButton" name="m_Fan2_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QPushButton" name="m_Fan2_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="fan3Caption">
+         <property name="text">
+          <string>Ventilateur 3</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QPushButton" name="m_Fan3_TestButton">
+         <property name="text">
+          <string>Test</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QPushButton" name="m_Fan3_OffButton">
+         <property name="text">
+          <string>Arrêt</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="faultsGroup">
+      <property name="title">
+       <string>Codes défauts</string>
+      </property>
+      <layout class="QVBoxLayout" name="faultsLayout">
+       <item>
+        <widget class="QListWidget" name="m_FaultsListWidget"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>900</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuOption">
+    <property name="title">
+     <string>Options</string>
+    </property>
+   </widget>
+   <addaction name="menuOption"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

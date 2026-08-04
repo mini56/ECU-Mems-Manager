@@ -1,129 +1,224 @@
 #ifndef MEMSINTERFACE_H
 #define MEMSINTERFACE_H
 
+#include <QMainWindow>
 #include <QObject>
+#include <QThread>
+#include <QTimer>
 #include <QString>
-#include <QHash>
-#include <QByteArray>
-#include <QHash>
-#include "rosco.h"
-#include "commonunits.h"
+#include <QStringList>
+#include <QFile>
+#include <QTextStream>
+#include <QSystemTrayIcon>
+#include <QMetaType>
 
-class MEMSInterface : public QObject
+#include <QtCharts/QChart>
+#include <QtCharts/QChartView>
+#include <QtCharts/QLineSeries>
+
+QT_CHARTS_USE_NAMESPACE
+
+#ifndef MEMS_INTERFACE_VERSION
+#define MEMS_INTERFACE_VERSION "0.9.0"
+#endif
+
+QT_FORWARD_DECLARE_CLASS(QSerialPort)
+
+namespace Ui { class MEMSInterface; }
+
+/*
+ * Runtime data snapshot produced by the worker (MEMSLogic) and consumed by the
+ * GUI. Passed across the worker/GUI thread boundary via a queued signal, so it
+ * is registered as a Qt meta-type (see Q_DECLARE_METATYPE below).
+ */
+struct MEMSData
+{
+    int         engineRPM     = 0;
+    double      coolantTemp   = 0.0;
+    double      intakeAirTemp = 0.0;
+    double      batteryVoltage = 0.0;
+    double      mapSensor     = 0.0;
+    QStringList faultCodes;
+};
+
+/*
+ * Worker object that owns the serial connection to the ECU. It lives in its
+ * own QThread so the GUI never blocks on serial I/O. All public entry points
+ * are slots (invoked via queued connections from the GUI) and all results are
+ * reported back through signals.
+ */
+class MEMSLogic : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit MEMSInterface(QString device, QObject *parent = 0);
-    ~MEMSInterface();
-
-    void setSerialDevice(QString device) { m_deviceName = device; }
-
-    QString getSerialDevice() { return m_deviceName; }
-    int getIntervalMsecs();
-
-    bool isConnected();
-    void disconnectFromECU();
-
-    mems_data* getData()          { return &m_data; }
-    librosco_version getVersion() { return mems_get_lib_version(); }
-
-    void cancelRead();
+    explicit MEMSLogic(QObject *parent = nullptr);
+    ~MEMSLogic();
 
 public slots:
-    void onParentThreadStarted();
-    void onFaultCodesClearRequested();
-	void onResetAdjustmentsRequested();
-	void onResetECURequested();
-    void onStartPollingRequest();
-    void onShutdownThreadRequest();
-    void onFuelPumpTest();
-	void onFuelPumpOn();
-	void onFuelPumpOff();
-    void onPTCRelayTest();
-	void onPTCRelayOn();
-	void onPTCRelayOff();
-    void onACRelayTest();
-	void onACRelayOn();
-	void onACRelayOff();
-    void onIgnitionCoilTest();
-    void onFuelInjectorTest();
-    void onIdleAirControlMovementRequest(int desiredPos);
-    void on_m_fuel_trim_plusButton_clicked();
-	void on_m_fuel_trim_minusButton_clicked();
-    void on_m_idle_decay_plusButton_clicked();
-    void on_m_idle_decay_minusButton_clicked();
-    void on_m_idle_speed_plusButton_clicked();
-    void on_m_idle_speed_minusButton_clicked();
-    void on_m_ignition_advance_plusButton_clicked();
-    void on_m_ignition_advance_minusButton_clicked();
-	void on_m_Purge_Valve_TestButton_clicked();
-    void on_m_Purge_Valve_OnButton_clicked();
-	void on_m_Purge_Valve_OffButton_clicked();
-	void on_m_O2Heater_TestButton_clicked();
-    void on_m_O2Heater_OnButton_clicked();
-    void on_m_O2Heater_OffButton_clicked();
-	void on_m_Boost_Valve_TestButton_clicked();
-    void on_m_Boost_Valve_OnButton_clicked();
-	void on_m_Boost_Valve_OffButton_clicked();
-	void on_m_Fan1_TestButton_clicked();
-    void on_m_Fan2_TestButton_clicked();
-	void on_m_Fan3_TestButton_clicked();
-    void on_m_Fan1_OnButton_clicked();
-    void on_m_Fan2_OnButton_clicked();
-	void on_m_Fan3_OnButton_clicked();
-	void on_m_Fan1_OffButton_clicked();
-    void on_m_Fan2_OffButton_clicked();
-	void on_m_Fan3_OffButton_clicked();
-	void on_m_IACMinusButton_clicked();
-	void on_m_IACPlusButton_clicked();
-	void on_m_AllActuatorsOffButton_clicked();
-	void on_interactive_push_button_clicked();
+    void connectToPort(const QString &portName);
+    void disconnectFromPort();
+    void startDataStream();
+    void stopDataStream();
+    void clearFaults();
+
+    // Actuator tests (activate)
+    void testFuelPump();
+    void testPTCRelay();
+    void testACRelay();
+    void testPurgeValve();
+    void testO2Heater();
+    void testBoostValve();
+    void testFan1();
+    void testFan2();
+    void testFan3();
+
+    // Actuator shut-off
+    void turnOffFuelPump();
+    void turnOffPTCRelay();
+    void turnOffACRelay();
+    void turnOffPurgeValve();
+    void turnOffO2Heater();
+    void turnOffBoostValve();
+    void turnOffFan1();
+    void turnOffFan2();
+    void turnOffFan3();
+
 signals:
-    void dataReady();
-    void connected();
-    void disconnected();
-    void readError();
-    void readSuccess();
-    void faultCodesClearSuccess();
-	void adjustmentsResetSuccess();
-	void ECUResetSuccess();
-    void failedToConnect(QString dev);
-    void interfaceThreadReady();
-    void notConnected();
-    void gotEcuId(uint8_t* id_buffer);
-    void errorSendingCommand();
-	void turnO2HeaterOff();
+    void connectionStatusChanged(bool connected, const QString &message);
+    void dataReceived(const MEMSData &data);
+    void faultsCleared();
+
     void fuelPumpTestComplete();
     void ptcRelayTestComplete();
     void acRelayTestComplete();
-	void O2HeaterTestComplete();
-	void BoostValveTestComplete();
-	void PurgeValveTestComplete();
-	void Fan1TestComplete();
-	void Fan2TestComplete();
-	void Fan3TestComplete();
-    void moveIACComplete();
-    void fuel_trim_plus();
-    void fuel_trim_minus();
-    void idle_decay_plus();
-    void idle_decay_minus();
-    void idle_speed_plus();
-    void idle_speed_minus();
-    void ignition_advance_plus();
-    void ignition_advance_minus();
-    void interactive_mode();
+    void purgeValveTestComplete();
+    void o2HeaterTestComplete();
+    void boostValveTestComplete();
+    void fan1TestComplete();
+    void fan2TestComplete();
+    void fan3TestComplete();
+
+private slots:
+    void pollOnce();
+
 private:
-    mems_data m_data;
-    QString m_deviceName;
-    mems_info m_memsinfo;
-    bool m_stopPolling;
-    bool m_shutdownThread;
-    bool m_initComplete;
-    bool m_serviceLoopRunning;
-    uint8_t m_d0_response_buffer[4];
-    void runServiceLoop();
-    bool connectToECU();
-    bool actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd);
+    QSerialPort *m_port    = nullptr;
+    QTimer      *m_pollTimer = nullptr;
+    bool         m_streaming = false;
 };
 
-#endif // CUXINTERFACE_H
+/*
+ * Main application window. Owns the UI (generated from memsinterface.ui),
+ * a live QtCharts plot, and the MEMSLogic worker running in m_logicThread.
+ */
+class MEMSInterface : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    explicit MEMSInterface(QWidget *parent = nullptr);
+    ~MEMSInterface();
+
+signals:
+    // GUI -> worker commands
+    void connectToPort(const QString &portName);
+    void disconnectFromPort();
+    void startDataStream();
+    void stopDataStream();
+    void clearFaults();
+
+    void testFuelPump();
+    void testPTCRelay();
+    void testACRelay();
+    void testPurgeValve();
+    void testO2Heater();
+    void testBoostValve();
+    void testFan1();
+    void testFan2();
+    void testFan3();
+
+    void turnOffFuelPump();
+    void turnOffPTCRelay();
+    void turnOffACRelay();
+    void turnOffPurgeValve();
+    void turnOffO2Heater();
+    void turnOffBoostValve();
+    void turnOffFan1();
+    void turnOffFan2();
+    void turnOffFan3();
+
+private slots:
+    // Auto-connected UI slots (connectSlotsByName)
+    void on_m_ConnectButton_clicked();
+    void on_m_DisconnectButton_clicked();
+    void on_m_StartStreamButton_clicked();
+    void on_m_StopStreamButton_clicked();
+    void on_m_ClearFaultsButton_clicked();
+    void on_m_SnapshotButton_clicked();
+
+    void on_m_FuelPump_TestButton_clicked();
+    void on_m_FuelPump_OffButton_clicked();
+    void on_m_PTC_Relay_TestButton_clicked();
+    void on_m_PTC_Relay_OffButton_clicked();
+    void on_m_AC_Relay_TestButton_clicked();
+    void on_m_AC_Relay_OffButton_clicked();
+    void on_m_Purge_Valve_TestButton_clicked();
+    void on_m_Purge_Valve_OffButton_clicked();
+    void on_m_O2_Heater_TestButton_clicked();
+    void on_m_O2_Heater_OffButton_clicked();
+    void on_m_Boost_Valve_TestButton_clicked();
+    void on_m_Boost_Valve_OffButton_clicked();
+    void on_m_Fan1_TestButton_clicked();
+    void on_m_Fan1_OffButton_clicked();
+    void on_m_Fan2_TestButton_clicked();
+    void on_m_Fan2_OffButton_clicked();
+    void on_m_Fan3_TestButton_clicked();
+    void on_m_Fan3_OffButton_clicked();
+
+    // Worker -> GUI feedback
+    void onConnectionStatusChanged(bool connected, const QString &message);
+    void onDataReceived(const MEMSData &data);
+    void onFaultsCleared();
+
+    void onFuelPumpTestComplete();
+    void onPTCRelayTestComplete();
+    void onACRelayTestComplete();
+    void onPurgeValveTestComplete();
+    void onO2HeaterTestComplete();
+    void onBoostValveTestComplete();
+    void onFan1TestComplete();
+    void onFan2TestComplete();
+    void onFan3TestComplete();
+
+private:
+    void refreshComPorts();
+    void updateUIState(bool connected);
+    void setActuatorTestsEnabled(bool enabled);
+    void setActuatorsOffEnabled(bool enabled);
+    void startAutoLogging();
+    void stopAutoLogging();
+
+    Ui::MEMSInterface *ui;
+
+    MEMSLogic  *m_memsLogic;
+    QThread     m_logicThread;
+
+    QChart      *m_chart;
+    QChartView  *m_chartView;
+    QLineSeries *m_rpmSeries;
+    QLineSeries *m_tempSeries;
+
+    QTimer      *m_reconnectTimer;
+    QString      m_lastPortName;
+    QStringList  m_previousFaults;
+
+    QFile       *m_autoLogFile;
+    QTextStream *m_autoLogStream;
+
+    QSystemTrayIcon *m_trayIcon;
+};
+
+Q_DECLARE_METATYPE(MEMSData)
+
+#endif // MEMSINTERFACE_H

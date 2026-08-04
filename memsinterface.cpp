@@ -21,6 +21,22 @@
 #include <QStandardPaths>
 #include <QApplication>
 
+namespace {
+// Compare deux listes de codes défauts sans passer par QList::operator==,
+// dont l'instanciation déclenche un bug de compilation Qt 5.15 / MSVC récent
+// (utilisation de stdext::make_checked_array_iterator, retiré des STL récents).
+bool faultCodesEqual(const QStringList &a, const QStringList &b)
+{
+    if (a.size() != b.size())
+        return false;
+    for (int i = 0; i < a.size(); ++i) {
+        if (a.at(i) != b.at(i))
+            return false;
+    }
+    return true;
+}
+} // namespace
+
 MEMSInterface::MEMSInterface(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MEMSInterface)
@@ -295,7 +311,7 @@ void MEMSInterface::onDataReceived(const MEMSData &data)
     }
 
     // Notification sonore et visuelle en cas d'apparition de nouveaux défauts
-    if (!data.faultCodes.isEmpty() && data.faultCodes != m_previousFaults) {
+    if (!data.faultCodes.isEmpty() && !faultCodesEqual(data.faultCodes, m_previousFaults)) {
         QApplication::beep();
         QApplication::alert(this, 3000);
         m_previousFaults = data.faultCodes;

@@ -8,8 +8,12 @@ project(${PNAME} CXX)
 add_definitions(-DPROJECTNAME=\"${PROJECTNAME}\")
 
 set(VER_MAJOR 0)
-set(VER_MINOR 6)
+set(VER_MINOR 9)
 set(VER_PATCH 0)
+add_compile_definitions(
+    APP_NAME="ECU Mems Manager"
+    APP_VERSION="0.9.0"
+)
 
 add_definitions("-DVER_MAJOR=${VER_MAJOR}"
                 "-DVER_MINOR=${VER_MINOR}"

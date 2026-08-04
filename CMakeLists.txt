@@ -150,3 +150,11 @@ else()
   include(CPack)
 
 endif()
+
+# --- Tests unitaires ---
+# Activer avec -DBUILD_TESTS=ON, puis lancer `ctest` dans le dossier de build.
+option(BUILD_TESTS "Build the unit tests" OFF)
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

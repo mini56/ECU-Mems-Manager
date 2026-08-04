@@ -37,5 +37,10 @@ void HelpViewer::onCloseClicked()
 
 void HelpViewer::onAnchorClicked(QUrl url)
 {
-  QDesktopServices::openUrl(url);
+  const QString scheme = url.scheme().toLower();
+
+  if (scheme == "http" || scheme == "https" || scheme == "mailto")
+  {
+    QDesktopServices::openUrl(url);
+  }
 }

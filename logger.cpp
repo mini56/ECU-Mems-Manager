@@ -1,6 +1,42 @@
 #include <QDir>
 #include <QDateTime>
+#include <QRegExp>
 #include "logger.h"
+
+namespace
+{
+
+/**
+ * Reduces a log name to a single safe path component, so that it cannot escape
+ * the log directory or address a device/hidden file.
+ */
+QString safeLogName(QString name)
+{
+  name.replace(QRegExp("[^A-Za-z0-9._-]"), "_");
+  name.remove(QRegExp("^[._]+"));
+
+  return name;
+}
+
+/**
+ * Makes a value received from the ECU safe to write as a CSV field: control
+ * characters and separators are removed, and a leading character that a
+ * spreadsheet would interpret as a formula is escaped.
+ */
+QString safeCsvField(QString value)
+{
+  value.replace(QRegExp("[\\x00-\\x1F\\x7F,\"]"), " ");
+  value = value.trimmed();
+
+  if (!value.isEmpty() && QString("=+-@").contains(value.at(0)))
+  {
+    value.prepend('\'');
+  }
+
+  return value;
+}
+
+}
 
 /**
  * Constructor. Sets the interface class pointer as
@@ -23,7 +59,7 @@ m_logExtension(".txt"), m_logDir("logs")
 } */
 bool Logger::EcuIdTransmitted(QString id)
 {
-	ecuid = id;
+	ecuid = safeCsvField(id);
 	return true;
 }
 
@@ -34,8 +70,14 @@ bool Logger::EcuIdTransmitted(QString id)
 bool Logger::openLog(QString fileName)
 {
   bool success = false;
+  const QString safeName = safeLogName(fileName);
 
-  m_lastAttemptedLog = m_logDir + QDir::separator() + fileName + m_logExtension;
+  if (safeName.isEmpty())
+  {
+    return false;
+  }
+
+  m_lastAttemptedLog = m_logDir + QDir::separator() + safeName + m_logExtension;
 
   // if the 'logs' directory exists, or if we're able to create it...
   if (!m_logFile.isOpen() && (QDir(m_logDir).exists() || QDir().mkdir(m_logDir)))

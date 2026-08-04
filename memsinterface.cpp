@@ -94,9 +94,16 @@ void MEMSInterface::onResetECURequested()
  */
 void MEMSInterface::onIdleAirControlMovementRequest(int desiredPos)
 {
+  if (desiredPos < 0 || desiredPos > 255)
+  {
+    emit errorSendingCommand();
+    emit moveIACComplete();
+    return;
+  }
+
   if (m_initComplete && mems_is_connected(&m_memsinfo))
   {
-    if (!mems_move_iac(&m_memsinfo, desiredPos))
+    if (!mems_move_iac(&m_memsinfo, (uint8_t)desiredPos))
     {
       emit errorSendingCommand();
     }

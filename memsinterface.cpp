@@ -241,13 +241,15 @@ void MEMSInterface::runServiceLoop()
 bool MEMSInterface::actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd)
 {
   bool status = false;
-  void sleep();
 
   if (m_initComplete && mems_is_connected(&m_memsinfo))
   {
+    // Only send the "off" command if the "on" command actually succeeded;
+    // otherwise the failure of the "on" command would be silently ignored.
     if (mems_test_actuator(&m_memsinfo, onCmd, NULL))
-		QThread::sleep(1);
     {
+      QThread::sleep(1);
+
       if (mems_test_actuator(&m_memsinfo, offCmd, NULL))
       {
         status = true;

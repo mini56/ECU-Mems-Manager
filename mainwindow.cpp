@@ -350,6 +350,15 @@ void MEMSInterface::startAutoLogging()
     if (m_autoLogFile->open(QIODevice::WriteOnly | QIODevice::Text)) {
         m_autoLogStream = new QTextStream(m_autoLogFile);
         *m_autoLogStream << "Timestamp,RPM,CoolantTemp,IntakeTemp,BatteryVoltage,MAP\n";
+    } else {
+        // Report the failure and reset state so we don't leave a half-open
+        // QFile behind that makes it look as if logging is active.
+        ui->statusbar->showMessage(
+            tr("Impossible d'ouvrir le fichier journal (%1) : %2")
+                .arg(filePath, m_autoLogFile->errorString()),
+            5000);
+        delete m_autoLogFile;
+        m_autoLogFile = nullptr;
     }
 }
 

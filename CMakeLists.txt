@@ -60,6 +60,7 @@ set(SOURCES
   analogwidgets/abstractmeter100.cpp
   analogwidgets/manometer900.cpp
   analogwidgets/abstractmeter900.cpp
+  memslogic.cpp
   
   # --- Fichiers d'interface utilisateur (.ui) ---
   # CMAKE_AUTOUIC générera automatiquement ui_memsinterface.h, ui_mainwindow.h, etc.

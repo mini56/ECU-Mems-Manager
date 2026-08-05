@@ -25,7 +25,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Charts SerialPort)
 
 # Inclusions des dossiers de sous-modules
 include_directories("${CMAKE_SOURCE_DIR}"
@@ -43,28 +43,13 @@ configure_file(
 set(SOURCES
   main.cpp
   memsinterface.cpp
-  helpviewer.cpp
-  logger.cpp
-  serialdevenumerator.cpp
+  memslogic.cpp
   splashprogress.cpp
-  mainwindow.cpp
-  aboutbox.cpp
-  optionsdialog.cpp
-  qledindicator/qledindicator.cpp
-  analogwidgets/led.cpp
-  analogwidgets/functions.cpp
-  analogwidgets/widgetwithbackground.cpp
-  analogwidgets/manometer.cpp
-  analogwidgets/abstractmeter.cpp
-  analogwidgets/manometer100.cpp
-  analogwidgets/abstractmeter100.cpp
-  analogwidgets/manometer900.cpp
-  analogwidgets/abstractmeter900.cpp
-  
+
   # --- Fichiers d'interface utilisateur (.ui) ---
-  # CMAKE_AUTOUIC générera automatiquement ui_memsinterface.h, ui_mainwindow.h, etc.
-  mainwindow.ui
-  
+  # CMAKE_AUTOUIC générera automatiquement ui_memsinterface.h.
+  memsinterface.ui
+
   # --- Fichiers de ressources (.qrc) ---
   resources.qrc
 )
@@ -90,21 +75,12 @@ if(WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
   endif()
 
-  # Recherche optionnelle de la bibliothèque rosco sous Windows
-  find_library(LIBROSCO_DLL rosco)
-  if(LIBROSCO_DLL)
-    message(STATUS "Bibliothèque rosco trouvée : ${LIBROSCO_DLL}")
-    target_link_libraries(${PNAME} PRIVATE ${LIBROSCO_DLL} Qt5::Widgets)
-  else()
-    message(STATUS "Bibliothèque rosco non trouvée, compilation avec Qt5::Widgets uniquement.")
-    target_link_libraries(${PNAME} PRIVATE Qt5::Widgets)
-  endif()
+  target_link_libraries(${PNAME} PRIVATE Qt5::Widgets Qt5::Charts Qt5::SerialPort)
 
 else()
   message(STATUS "Environnement Linux/Unix détecté.")
 
-  # Sur Linux, on lie directement rosco et Qt5
-  target_link_libraries(${PNAME} PRIVATE rosco Qt5::Widgets)
+  target_link_libraries(${PNAME} PRIVATE Qt5::Widgets Qt5::Charts Qt5::SerialPort)
 
   set(CMAKE_SKIP_RPATH TRUE)
   set(CMAKE_INSTALL_PREFIX "/usr")
@@ -149,4 +125,12 @@ else()
 
   include(CPack)
 
+endif()
+
+# --- Tests unitaires ---
+# Activer avec -DBUILD_TESTS=ON, puis lancer `ctest` dans le dossier de build.
+option(BUILD_TESTS "Build the unit tests" OFF)
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
 endif()

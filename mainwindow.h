@@ -25,6 +25,7 @@
 #include <iostream>
 #include <QTreeWidget>
 #include "memslogic.h"
+
 namespace Ui
 {
     class MainWindow;
@@ -33,6 +34,9 @@ namespace Ui
 class MainWindow : public QMainWindow
 {    
     Q_OBJECT
+private:
+    MEMSLogic *m_memsLogic;  // Déclaration de m_memsLogic
+    QThread *m_logicThread;  // Déclaration de m_logicThread
 
 public:
     MainWindow(QWidget *parent = 0);

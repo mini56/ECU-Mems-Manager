@@ -22,10 +22,9 @@
 #include <qwidget.h>
 #include <qlayout.h>
 #include <qobject.h>
-
 #include <iostream>
-
 #include <QTreeWidget>
+#include "memslogic.h"
 namespace Ui
 {
     class MainWindow;

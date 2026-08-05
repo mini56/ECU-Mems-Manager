@@ -96,6 +96,16 @@ if(WIN32)
     message(STATUS "Bibliothèque rosco trouvée : ${LIBROSCO_DLL}")
     target_link_libraries(${PNAME} PRIVATE rosco Qt5::Widgets Qt5::SerialPort)
   else()
+    message(STATUS "Bibliothèque rosco non trouvée, compilation avec Qt5::Widgets et Qt5::SerialPort.")
+    target_link_libraries(${PNAME} PRIVATE Qt5::Widgets Qt5::SerialPort)  # <-- Ajoute Qt5::SerialPort ici
+  endif()
+
+  # Recherche optionnelle de la bibliothèque rosco sous Windows
+  find_library(LIBROSCO_DLL rosco)
+  if(LIBROSCO_DLL)
+    message(STATUS "Bibliothèque rosco trouvée : ${LIBROSCO_DLL}")
+    target_link_libraries(${PNAME} PRIVATE rosco Qt5::Widgets Qt5::SerialPort)
+  else()
     message(STATUS "Bibliothèque rosco non trouvée, compilation avec Qt5::Widgets uniquement.")
     target_link_libraries(${PNAME} PRIVATE Qt5::Widgets)
   endif()

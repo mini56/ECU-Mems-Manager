@@ -1,56 +1,62 @@
 #ifndef ECUINTERFACE_H
 #define ECUINTERFACE_H
 
+#include <QObject>
 #include <QString>
-#include "../rosco.h"
 
-/*
- * Interface commune à tous les calculateurs Rover MEMS.
- * Toutes les versions (1.2, 1.3, 1.6...) devront hériter de cette classe.
- */
+struct mems_data;
 
-class ECUInterface
+class ECUInterface : public QObject
 {
+    Q_OBJECT
+
 public:
 
-    virtual ~ECUInterface() {}
+    explicit ECUInterface(QObject *parent = nullptr);
+    virtual ~ECUInterface();
 
-    // Nom de la famille MEMS
-    virtual QString nomECU() const = 0;
+    // Connexion
+    virtual bool connectECU() = 0;
+    virtual void disconnectECU() = 0;
+    virtual bool isConnected() const = 0;
 
-    // Version
-    virtual QString versionECU() const = 0;
+    // Détection
+    virtual bool detectECU() = 0;
+    virtual QString ecuName() const = 0;
+    virtual QString ecuVersion() const = 0;
 
-    // Initialisation
-    virtual bool initialiser(mems_info *info) = 0;
+    // Données temps réel
+    virtual bool startPolling() = 0;
+    virtual void stopPolling() = 0;
+    virtual mems_data *liveData() = 0;
 
-    // Lecture des données temps réel
-    virtual bool lireDonnees(mems_data *data) = 0;
+    // Défauts
+    virtual bool readFaultCodes() = 0;
+    virtual bool clearFaultCodes() = 0;
 
-    // Lecture de l'identifiant ECU
-    virtual bool lireIdentifiant(uint8_t *buffer) = 0;
+    // Actionneurs
+    virtual bool fuelPump(bool enable) = 0;
+    virtual bool purgeValve(bool enable) = 0;
+    virtual bool o2Heater(bool enable) = 0;
+    virtual bool coolingFan(int fan,bool enable) = 0;
+    virtual bool moveIAC(int position) = 0;
 
-    // Effacement des défauts
-    virtual bool effacerDefauts() = 0;
-
-    // Remise à zéro des adaptations
+    // Réinitialisations
+    virtual bool resetECU() = 0;
     virtual bool resetAdaptations() = 0;
 
-    // Réinitialisation ECU
-    virtual bool resetECU() = 0;
+    // ROM
+    virtual bool readROM() = 0;
+    virtual bool writeROM() = 0;
 
-    // Présence de la lecture ROM
-    virtual bool supportLectureROM() const
-    {
-        return false;
-    }
+signals:
 
-    // Présence de l'écriture ROM
-    virtual bool supportEcritureROM() const
-    {
-        return false;
-    }
+    void connected();
+    void disconnected();
 
+    void dataReady();
+
+    void communicationError(QString message);
 };
 
 #endif

@@ -25,7 +25,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5Widgets REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort)
 
 # Inclusions des dossiers de sous-modules
 include_directories("${CMAKE_SOURCE_DIR}"
@@ -94,7 +94,7 @@ if(WIN32)
   find_library(LIBROSCO_DLL rosco)
   if(LIBROSCO_DLL)
     message(STATUS "Bibliothèque rosco trouvée : ${LIBROSCO_DLL}")
-    target_link_libraries(${PNAME} PRIVATE ${LIBROSCO_DLL} Qt5::Widgets)
+    target_link_libraries(${PNAME} PRIVATE rosco Qt5::Widgets Qt5::SerialPort)
   else()
     message(STATUS "Bibliothèque rosco non trouvée, compilation avec Qt5::Widgets uniquement.")
     target_link_libraries(${PNAME} PRIVATE Qt5::Widgets)

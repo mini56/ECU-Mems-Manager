@@ -49,10 +49,9 @@ configure_file(
 # Sources
 set(SOURCES
     main.cpp
-
     memsinterface.cpp
     memslogic.cpp
-
+    database/DatabaseSeed.cpp
     helpviewer.cpp
     logger.cpp
     serialdevenumerator.cpp

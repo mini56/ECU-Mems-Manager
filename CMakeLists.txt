@@ -29,7 +29,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Charts)
+find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Charts Sql)
 
 # Dossiers du projet
 include_directories(
@@ -83,6 +83,9 @@ set(SOURCES
 
     # Ressources
     resources.qrc
+    
+    # Sql
+    database/DatabaseManager.cpp
 )
 
 # Exécutable
@@ -133,6 +136,7 @@ if(WIN32)
             Qt5::Widgets
             Qt5::SerialPort
             Qt5::Charts
+            Qt5::Sql
         )
 
     else()
@@ -148,6 +152,7 @@ if(WIN32)
             Qt5::Widgets
             Qt5::SerialPort
             Qt5::Charts
+            Qt5::Sql
         )
 
     endif()

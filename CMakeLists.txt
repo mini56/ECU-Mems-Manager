@@ -29,7 +29,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort)
+find_package(Qt5 REQUIRED COMPONENTS Widgets SerialPort Charts)
 
 # Dossiers du projet
 include_directories(
@@ -132,6 +132,7 @@ if(WIN32)
             ${LIBROSCO_DLL}
             Qt5::Widgets
             Qt5::SerialPort
+            Qt5::Charts
         )
 
     else()
@@ -146,6 +147,7 @@ if(WIN32)
             PRIVATE
             Qt5::Widgets
             Qt5::SerialPort
+            Qt5::Charts
         )
 
     endif()

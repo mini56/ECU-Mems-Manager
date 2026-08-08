@@ -1,4 +1,4 @@
-```cmake
+
 cmake_minimum_required(VERSION 3.16)
 
 set(PROJECTNAME "ECU_Mems_Manager")
@@ -267,4 +267,4 @@ else()
     include(CPack)
 
 endif()
-```
+

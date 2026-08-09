@@ -1242,6 +1242,3 @@ bool DatabaseManager::linkEcuActuator(
 
     return query.exec();
 }
-```
-
-```

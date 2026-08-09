@@ -61,7 +61,7 @@ set(SOURCES
     optionsdialog.cpp
 
     # ECU Manager
-    ecu/ecuManager.cpp
+    scr/ecu/ecumanager.cpp
 
     # QLedIndicator
     qledindicator/qledindicator.cpp

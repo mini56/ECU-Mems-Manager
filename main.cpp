@@ -1,4 +1,3 @@
-```cpp
 #include <QApplication>
 #include <QMessageBox>
 

@@ -5,6 +5,7 @@
 #include <QSqlQuery>
 #include <QVariant>
 #include <QUuid>
+#include <QSqlRecord>
 
 QVariantList DatabaseManager::queryList(
     const QString &sql,

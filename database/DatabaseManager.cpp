@@ -1,4 +1,3 @@
-```cpp
 #include "DatabaseManager.h"
 #include <QCoreApplication>
 #include <QDir>

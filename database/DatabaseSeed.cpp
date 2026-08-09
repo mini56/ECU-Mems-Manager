@@ -1,4 +1,3 @@
-```cpp
 #include "DatabaseSeed.h"
 
 namespace DatabaseSeed
@@ -130,4 +129,3 @@ bool populate(DatabaseManager &database)
 }
 
 }
-```

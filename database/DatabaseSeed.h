@@ -1,4 +1,3 @@
-```cpp
 #ifndef DATABASESEED_H
 #define DATABASESEED_H
 
@@ -10,4 +9,3 @@ namespace DatabaseSeed
 }
 
 #endif // DATABASESEED_H
-```

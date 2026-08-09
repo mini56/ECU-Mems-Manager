@@ -755,9 +755,6 @@ bool DatabaseManager::createEcuActuatorTable()
     );
 }
 
-#include <QSqlQuery>
-#include <QSqlError>
-
 QVariantList DatabaseManager::queryList(
     const QString &sql,
     const QVariantList &values) const

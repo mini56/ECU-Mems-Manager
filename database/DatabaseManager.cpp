@@ -488,8 +488,6 @@ bool DatabaseManager::linkEcuActuator(
 
     return query.exec();
 }
-```
-
 
 DatabaseManager::DatabaseManager(QObject *parent)
     : QObject(parent),

@@ -24,6 +24,8 @@ jobs:
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
+        modules: 'qtcharts'
+        
 
     # 3. Configuration des outils de compilation Microsoft (MSVC)
     - name: Setup MSVC

@@ -2,9 +2,9 @@ name: Build ECU Mems Manager (Windows)
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
   pull_request:
-    branches: [ "main", "master" ]
+    branches: ["main", "master"]
 
 jobs:
   build-windows:
@@ -12,47 +12,46 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # 1. Récupération du code source (inclut ton dossier prebuilt-librosco)
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # 1. Récupération du code source (inclut ton dossier prebuilt-librosco)
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # 2. Installation des bibliothèques Qt 5
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-      version: '5.15.2'
-      host: 'windows'
-      target: 'desktop'
-      arch: 'win64_msvc2019_64'
-      install-deps: true
-      modules: 'qtcharts'
-      cache: false
-      add-tools-to-path: true
-      set-env: true
-        
+      # 2. Installation des bibliothèques Qt 5
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          install-deps: true
+          modules: 'qtcharts'
+          cache: false
+          add-tools-to-path: true
+          set-env: true
 
-    # 3. Configuration des outils de compilation Microsoft (MSVC)
-    - name: Setup MSVC
-      uses: ilammy/msvc-dev-cmd@v1
+      # 3. Configuration des outils de compilation Microsoft (MSVC)
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
 
-    # 4. Configuration avec CMake (pointé vers ton dossier prebuilt)
-    - name: Configure CMake
-      run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prebuilt-librosco"
+      # 4. Configuration avec CMake (pointé vers ton dossier prebuilt)
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prebuilt-librosco"
 
-    # 5. Compilation du projet
-    - name: Build Application
-      run: cmake --build build --config Release
+      # 5. Compilation du projet
+      - name: Build Application
+        run: cmake --build build --config Release
 
-    # 6. Déploiement des DLLs Qt ET copie de ta DLL depuis prebuilt-librosco
-    - name: Deploy Qt DLLs and librosco
-      run: |
-        windeployqt build/Release/ecu_mems_manager.exe
-        Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/librosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
-        Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/rosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
+      # 6. Déploiement des DLLs Qt ET copie de tes DLLs depuis prebuilt-librosco
+      - name: Deploy Qt DLLs and librosco
+        run: |
+          windeployqt build/Release/ecu_mems_manager.exe
+          Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/librosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
+          Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/rosco.dll" -Destination "build/Release/" -ErrorAction SilentlyContinue
 
-    # 7. Sauvegarde du résultat téléchargeable sur GitHub
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: ECU-Mems-Manager-Windows
-        path: build/Release/
+      # 7. Sauvegarde du résultat téléchargeable sur GitHub
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ECU-Mems-Manager-Windows
+          path: build/Release/

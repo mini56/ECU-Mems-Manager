@@ -10,7 +10,6 @@ class ECUManager : public QObject
     Q_OBJECT
 
 public:
-
     explicit ECUManager(QObject *parent = nullptr);
     ~ECUManager();
 
@@ -46,12 +45,10 @@ public:
     bool writeROM();
 
 signals:
-
     void connected();
     void disconnected();
 
     void liveDataUpdated();
-
     void faultCodesUpdated();
 
     void ecuDetected(QString ecuName);
@@ -59,9 +56,7 @@ signals:
     void error(QString message);
 
 private:
-
     ECUInterface *m_ecu;
-
 };
 
-#endif
+#endif // ECUMANAGER_H

@@ -12,11 +12,9 @@ jobs:
     runs-on: windows-latest  
   
     steps:  
-      # 1. Recuperation du code source (inclut le dossier prebuilt-librosco)  
       - name: Checkout repository  
         uses: actions/checkout@v4  
   
-      # 2. Python (necessaire pour aqtinstall)  
       - name: Installer Python  
         uses: actions/setup-python@v5  
         with:  
@@ -25,39 +23,33 @@ jobs:
       - name: Installer aqtinstall  
         run: pip install aqtinstall  
   
-      # 3. Installation de Qt 5.15.2 MinGW 32 bits + module Charts  
       - name: Installer Qt 5.15.2 MinGW 32 bits  
         run: |  
           aqt install-qt windows desktop 5.15.2 win32_mingw81 -m qtcharts -O C:\Qt  
           aqt install-tool windows desktop tools_mingw qt.tools.win32_mingw810 -O C:\Qt  
   
-      # 4. Ajout de MinGW au PATH  
-      - name: Ajouter MinGW au PATH  
-        run: echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append 
-
-        # 4b. Generer la bibliotheque d'import librosco.dll.a a partir de la DLL  
+      - name: Ajouter MinGW et Qt au PATH  
+        run: |  
+          echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
+          echo "C:\Qt\5.15.2\mingw81_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
+  
       - name: Generer l'import lib librosco  
         run: |  
           cd prebuilt-librosco  
           gendef librosco.dll  
-          dlltool -d librosco.def -l librosco.dll.a
+          dlltool -d librosco.def -l librosco.dll.a  
   
-      # 5. Configuration avec CMake (Qt + prebuilt-librosco)  
       - name: Configure CMake  
         run: cmake -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/5.15.2/mingw81_32;${{ github.workspace }}/prebuilt-librosco"  
   
-      # 6. Compilation du projet  
       - name: Build Application  
         run: cmake --build build  
   
-      # 7. Deploiement des DLLs Qt et copie des DLLs librosco  
       - name: Deploy Qt DLLs and librosco  
         run: |  
           windeployqt build/ecu_mems_manager.exe  
           Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/librosco.dll" -Destination "build/" -ErrorAction SilentlyContinue  
-          Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/rosco.dll" -Destination "build/" -ErrorAction SilentlyContinue  
   
-      # 8. Upload de l'artefact  
       - name: Upload Artifact  
         uses: actions/upload-artifact@v4  
         with:  

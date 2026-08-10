@@ -33,7 +33,14 @@ jobs:
   
       # 4. Ajout de MinGW au PATH  
       - name: Ajouter MinGW au PATH  
-        run: echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
+        run: echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append 
+
+        # 4b. Generer la bibliotheque d'import librosco.dll.a a partir de la DLL  
+      - name: Generer l'import lib librosco  
+        run: |  
+          cd prebuilt-librosco  
+          gendef librosco.dll  
+          dlltool -d librosco.def -l librosco.dll.a
   
       # 5. Configuration avec CMake (Qt + prebuilt-librosco)  
       - name: Configure CMake  

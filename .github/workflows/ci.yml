@@ -16,6 +16,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Installer Python (nécessaire pour aqtinstall)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       # 2. Installation des bibliothèques Qt 5
       - name: Install Qt
         uses: jurplel/install-qt-action@v3

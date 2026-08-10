@@ -22,19 +22,13 @@ jobs:
           python-version: '3.11'
 
       # 2. Installation des bibliothèques Qt 5
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: '5.15.2'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          install-deps: true
-          modules: 'qtcharts qtserialport'
-          cache: false
-          cache-key-prefix: install-qt-action
-          add-tools-to-path: true
-          set-env: true
+       - name: Installer aqtinstall (outil officiel de récupération de Qt)
+        run: pip install aqtinstall
+
+      - name: Installer Qt 5.15.2 MinGW 32 bits (correspond à votre librosco.dll)
+        run: |
+          aqt install-qt windows desktop 5.15.2 win32_mingw81 -O C:\Qt
+          aqt install-tool windows desktop tools_mingw qt.tools.win32_mingw810 -O C:\Qt
 
       # 3. Configuration des outils de compilation Microsoft (MSVC)
       - name: Setup MSVC

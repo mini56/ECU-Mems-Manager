@@ -22,7 +22,7 @@
 #include "logger.h"
 #include "commonunits.h"
 #include "helpviewer.h"
-#include "ecu/ecumanager.h"
+#include "scr/ecu/ecumanager.h"
 
 namespace Ui
 {

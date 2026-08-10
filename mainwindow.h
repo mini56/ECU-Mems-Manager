@@ -34,8 +34,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 private:
-    MEMSLogic *m_memsLogic;
-    QThread *m_logicThread;
+    MEMSLogic *memsLogic;
+    QThread *logicThread;
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);

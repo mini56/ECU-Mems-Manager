@@ -146,10 +146,10 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    Ui::MainWindow *m_ui;
+    Ui::MainWindow *ui;
 
-    QThread *m_memsThread;
-    MEMSInterface *m_mems;
+    QThread *memsThread;
+    MEMSInterface *mems;
 
     /*
      * Nouveau gestionnaire ECU.
@@ -157,33 +157,33 @@ private:
      * MEMSInterface reste présent pour conserver
      * le fonctionnement actuel de l'application.
      */
-    ECUManager *m_ecuManager;
+    ECUManager *ecuManager;
 
-    OptionsDialog *m_options;
-    AboutBox *m_aboutBox;
-    QMessageBox *m_pleaseWaitBox;
-    HelpViewer *m_helpViewerDialog;
+    OptionsDialog *options;
+    AboutBox *aboutBox;
+    QMessageBox *pleaseWaitBox;
+    HelpViewer *helpViewerDialog;
 
-    Logger *m_logger;
+    Logger *logger;
 
-    QTimer *m_reconnectTimer;
-    bool m_autoReconnectEnabled;
+    QTimer *reconnectTimer;
+    bool autoReconnectEnabled;
 
-    quint32 m_prevFaultMask;
-    bool m_prevFaultMaskValid;
+    quint32 prevFaultMask;
+    bool prevFaultMaskValid;
 
     const float mapGaugeMaxPsi = 16.0f;
     const float mapGaugeMaxKPa = 160.0f;
 
-    bool m_actuatorTestsEnabled;
-    bool m_actuatorsOffEnabled;
-    bool m_adjustmentsEnabled;
+    bool actuatorTestsEnabled;
+    bool actuatorsOffEnabled;
+    bool adjustmentsEnabled;
 
-    QHash<TemperatureUnits, QString> *m_tempUnitSuffix;
-    QHash<TemperatureUnits, QPair<int, int> > *m_tempRange;
-    QHash<TemperatureUnits, QPair<int, int> > *m_tempLimits;
-    QHash<TemperatureUnits, QPair<int, int> > *m_airtempRange;
-    QHash<TemperatureUnits, QPair<int, int> > *m_airtempLimits;
+    QHash<TemperatureUnits, QString> *tempUnitSuffix;
+    QHash<TemperatureUnits, QPair<int, int> > *tempRange;
+    QHash<TemperatureUnits, QPair<int, int> > *tempLimits;
+    QHash<TemperatureUnits, QPair<int, int> > *airtempRange;
+    QHash<TemperatureUnits, QPair<int, int> > *airtempLimits;
 
     void buildSpeedAndTempUnitTables();
     void setupWidgets();
@@ -233,53 +233,53 @@ private slots:
     void setActuatorsOffEnabled(bool enabled);
     void setAdjustmentsEnabled(bool enabled);
 
-    void on_m_fuel_trim_plusButton_clicked();
-    void on_m_fuel_trim_minusButton_clicked();
+    void on_fuel_trim_plusButton_clicked();
+    void on_fuel_trim_minusButton_clicked();
 
-    void on_m_idle_decay_plusButton_clicked();
-    void on_m_idle_decay_minusButton_clicked();
+    void on_idle_decay_plusButton_clicked();
+    void on_idle_decay_minusButton_clicked();
 
-    void on_m_idle_speed_plusButton_clicked();
-    void on_m_idle_speed_minusButton_clicked();
+    void on_idle_speed_plusButton_clicked();
+    void on_idle_speed_minusButton_clicked();
 
     void on_exitButton_clicked();
 
-    void on_m_ignition_advance_plusButton_clicked();
-    void on_m_ignition_advance_minusButton_clicked();
+    void on_ignition_advance_plusButton_clicked();
+    void on_ignition_advance_minusButton_clicked();
 
-    void on_m_idle_air_plusButton_clicked();
-    void on_m_idle_air_minusButton_clicked();
+    void on_idle_air_plusButton_clicked();
+    void on_idle_air_minusButton_clicked();
 
     void on_interactive_push_button_clicked();
 
-    void on_m_Purge_Valve_TestButton_clicked();
-    void on_m_Purge_Valve_OnButton_clicked();
+    void on_Purge_Valve_TestButton_clicked();
+    void on_Purge_Valve_OnButton_clicked();
     void on_m_Purge_Valve_OffButton_clicked();
 
-    void on_m_O2Heater_TestButton_clicked();
-    void on_m_O2Heater_OnButton_clicked();
-    void on_m_O2Heater_OffButton_clicked();
+    void on_O2Heater_TestButton_clicked();
+    void on_O2Heater_OnButton_clicked();
+    void on_O2Heater_OffButton_clicked();
 
-    void on_m_Boost_Valve_TestButton_clicked();
-    void on_m_Boost_Valve_OnButton_clicked();
-    void on_m_Boost_Valve_OffButton_clicked();
+    void on_Boost_Valve_TestButton_clicked();
+    void on_Boost_Valve_OnButton_clicked();
+    void on_Boost_Valve_OffButton_clicked();
 
-    void on_m_Fan1_TestButton_clicked();
-    void on_m_Fan2_TestButton_clicked();
-    void on_m_Fan3_TestButton_clicked();
+    void on_Fan1_TestButton_clicked();
+    void on_Fan2_TestButton_clicked();
+    void on_Fan3_TestButton_clicked();
 
-    void on_m_Fan1_OnButton_clicked();
-    void on_m_Fan2_OnButton_clicked();
-    void on_m_Fan3_OnButton_clicked();
+    void on_Fan1_OnButton_clicked();
+    void on_Fan2_OnButton_clicked();
+    void on_Fan3_OnButton_clicked();
 
-    void on_m_Fan1_OffButton_clicked();
-    void on_m_Fan2_OffButton_clicked();
-    void on_m_Fan3_OffButton_clicked();
+    void on_Fan1_OffButton_clicked();
+    void on_Fan2_OffButton_clicked();
+    void on_Fan3_OffButton_clicked();
 
-    void on_m_IACMinusButton_clicked();
-    void on_m_IACPlusButton_clicked();
+    void on_IACMinusButton_clicked();
+    void on_IACPlusButton_clicked();
 
-    void on_m_AllActuatorsOffButton_clicked();
+    void on_AllActuatorsOffButton_clicked();
 };
 
 class MainWidget : public QWidget

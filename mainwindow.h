@@ -158,7 +158,7 @@ private:
      * le fonctionnement actuel de l'application.
      */
     ECUManager *m_ecuManager;
-
+    SummaryTab *m_summaryTab;
     OptionsDialog *m_options;
     AboutBox *m_aboutBox;
     QMessageBox *m_pleaseWaitBox;

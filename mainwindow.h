@@ -14,7 +14,7 @@
 #include <analogwidgets/manometer100.h>
 #include <analogwidgets/manometer900.h>
 #include <qledindicator/qledindicator.h>
-
+#include "summarytab.h"
 #include "optionsdialog.h"
 #include "memsinterface.h"
 #include "memslogic.h"

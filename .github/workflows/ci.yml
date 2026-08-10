@@ -16,40 +16,41 @@ jobs:
       - name: Checkout repository  
         uses: actions/checkout@v4  
   
-      - name: Installer Python (necessaire pour aqtinstall)  
+      # 2. Python (necessaire pour aqtinstall)  
+      - name: Installer Python  
         uses: actions/setup-python@v5  
         with:  
           python-version: '3.11'  
   
-      # 2. Installation de Qt 5 (MinGW 32 bits)  
       - name: Installer aqtinstall  
         run: pip install aqtinstall  
   
+      # 3. Installation de Qt 5.15.2 MinGW 32 bits + module Charts  
       - name: Installer Qt 5.15.2 MinGW 32 bits  
         run: |  
-          aqt install-qt windows desktop 5.15.2 win32_mingw81 -O C:\Qt  
+          aqt install-qt windows desktop 5.15.2 win32_mingw81 -m qtcharts -O C:\Qt  
           aqt install-tool windows desktop tools_mingw qt.tools.win32_mingw810 -O C:\Qt  
   
-      # 3. Ajout de MinGW au PATH  
+      # 4. Ajout de MinGW au PATH  
       - name: Ajouter MinGW au PATH  
         run: echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
   
-      # 4. Configuration avec CMake (Qt + prebuilt-librosco)  
+      # 5. Configuration avec CMake (Qt + prebuilt-librosco)  
       - name: Configure CMake  
         run: cmake -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/5.15.2/mingw81_32;${{ github.workspace }}/prebuilt-librosco"  
   
-      # 5. Compilation du projet  
+      # 6. Compilation du projet  
       - name: Build Application  
         run: cmake --build build  
   
-      # 6. Deploiement des DLLs Qt et copie des DLLs librosco  
+      # 7. Deploiement des DLLs Qt et copie des DLLs librosco  
       - name: Deploy Qt DLLs and librosco  
         run: |  
           windeployqt build/ecu_mems_manager.exe  
           Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/librosco.dll" -Destination "build/" -ErrorAction SilentlyContinue  
           Copy-Item -Path "${{ github.workspace }}/prebuilt-librosco/rosco.dll" -Destination "build/" -ErrorAction SilentlyContinue  
   
-      # 7. Upload de l'artefact  
+      # 8. Upload de l'artefact  
       - name: Upload Artifact  
         uses: actions/upload-artifact@v4  
         with:  

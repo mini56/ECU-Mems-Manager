@@ -22,7 +22,7 @@ jobs:
           python-version: '3.11'
 
       # 2. Installation des bibliothèques Qt 5
-       - name: Installer aqtinstall (outil officiel de récupération de Qt)
+      - name: Installer aqtinstall (outil officiel de récupération de Qt)
         run: pip install aqtinstall
 
       - name: Installer Qt 5.15.2 MinGW 32 bits (correspond à votre librosco.dll)

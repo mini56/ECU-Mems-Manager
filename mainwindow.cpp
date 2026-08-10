@@ -196,7 +196,7 @@ void MainWindow::setupWidgets()
 
   // Ajout de l'onglet "toutes les mesures" (reconstruit : son contenu
   // d'origine était resté commenté dans le fichier .ui, le rendant vide)
-  m_summaryTab = new SummaryTab(this);
+  summaryTab = new SummaryTab(this);
   m_ui->Tab_main->insertTab(2, m_summaryTab, "Toutes les mesures");
 
   // Ajout de l'onglet "Analyse" (lecture de fichiers CSV enregistrés)

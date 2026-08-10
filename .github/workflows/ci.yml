@@ -18,17 +18,25 @@ jobs:
 
       # 2. Installation des bibliothèques Qt 5
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+        uses: jurplel/install-qt-action@v3
         with:
           version: '5.15.2'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
           install-deps: true
-          modules: 'qtcharts'
+          modules: 'qtcharts qtserialport'
           cache: false
+          cache-key-prefix: install-qt-action
           add-tools-to-path: true
           set-env: true
+          no-qt-binaries: false
+          tools-only: false
+          aqtversion: ==3.1.*
+          py7zrversion: ==0.20.*
+          source: false
+          documentation: false
+          examples: false
 
       # 3. Configuration des outils de compilation Microsoft (MSVC)
       - name: Setup MSVC

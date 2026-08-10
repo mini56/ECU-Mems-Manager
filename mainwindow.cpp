@@ -1397,15 +1397,10 @@ void MainWindow::onStopLogging()
 /**
  * Displays an dialog box with information about the program.
  */
-void MainWindow::onHelpAboutClicked()
-{
-  if (m_aboutBox == 0)
-  {
-    m_aboutBox = new AboutBox(style(), this->windowTitle(), m_mems->getVersion(), this);
-  }
-  m_aboutBox->exec();
+void MainWindow::onHelpAboutClicked()  
+{  
+  AboutBox::showAbout(this);  
 }
-
 /**
  * Displays the online help.
  */

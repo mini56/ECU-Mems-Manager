@@ -59,7 +59,9 @@ set(SOURCES
     mainwindow.cpp
     aboutbox.cpp
     optionsdialog.cpp
-
+    summarytab.cpp  
+    analysistab.cpp
+    
     # ECU Manager
     scr/ecu/ecumanager.cpp
     scr/ecu/ecumanager.h

@@ -137,7 +137,6 @@ MainWindow::~MainWindow()
   delete m_tempRange;
   delete m_airtempRange;
   delete m_tempUnitSuffix;
-  delete m_aboutBox;
   delete m_options;
   delete m_mems;
   delete m_memsThread;

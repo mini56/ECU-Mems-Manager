@@ -7,7 +7,7 @@
 #include <QUuid>
 #include <QSqlRecord>
 
-
+QVariantList DatabaseManager::queryList(
     const QString &sql,
     const QVariantList &values) const
 {

@@ -30,13 +30,13 @@ jobs:
           aqt install-qt windows desktop 5.15.2 win32_mingw81 -O C:\Qt
           aqt install-tool windows desktop tools_mingw qt.tools.win32_mingw810 -O C:\Qt
 
-      # 3. Configuration des outils de compilation Microsoft (MSVC)
-      - name: Setup MSVC
-        uses: ilammy/msvc-dev-cmd@v1
+      # 3. Configuration des outils de compilation Microsoft 
+      - name: Ajouter MinGW au PATH
+        run: echo "C:\Qt\Tools\mingw810_32\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       # 4. Configuration avec CMake (pointé vers ton dossier prebuilt)
-      - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/prebuilt-librosco"
+       CMAKE_PREFIX_PATH :
+        run: cmake -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/5.15.2/mingw81_32;${{ github.workspace }}/prebuilt-librosco"
 
       # 5. Compilation du projet
       - name: Build Application

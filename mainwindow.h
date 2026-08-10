@@ -160,7 +160,6 @@ private:
     ECUManager *m_ecuManager;
     SummaryTab *m_summaryTab;
     OptionsDialog *m_options;
-    AboutBox *m_aboutBox;
     QMessageBox *m_pleaseWaitBox;
     HelpViewer *m_helpViewerDialog;
 

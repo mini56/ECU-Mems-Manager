@@ -24,24 +24,56 @@ MEMSInterface::~MEMSInterface()
 }
 
 /**
+ * Checks that the ECU link is up, emitting notConnected() when it is not.
+ * @return True when a command may be sent to the ECU; false otherwise.
+ */
+bool MEMSInterface::requireConnection()
+{
+  if (isConnected())
+  {
+    return true;
+  }
+
+  emit notConnected();
+  return false;
+}
+
+/**
+ * Reports the outcome of a command sent to the ECU.
+ * @return The value of commandSucceeded, for convenience.
+ */
+bool MEMSInterface::reportCommandResult(bool commandSucceeded)
+{
+  if (!commandSucceeded)
+  {
+    emit errorSendingCommand();
+  }
+
+  return commandSucceeded;
+}
+
+/**
+ * Sends a single actuator command to the ECU, if it is connected.
+ * @return True if the command was sent successfully; false otherwise.
+ */
+bool MEMSInterface::sendActuatorCommand(actuator_cmd cmd)
+{
+  if (!isConnected())
+  {
+    return false;
+  }
+
+  return reportCommandResult(mems_test_actuator(&m_memsinfo, cmd, NULL));
+}
+
+/**
  * Clears the block of fault codes.
  */
 void MEMSInterface::onFaultCodesClearRequested()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (requireConnection() && reportCommandResult(mems_clear_faults(&m_memsinfo)))
   {
-    if (mems_clear_faults(&m_memsinfo))
-    {
-      emit faultCodesClearSuccess();
-    }
-    else
-    {
-      emit errorSendingCommand();
-    }
-  }
-  else
-  {
-    emit notConnected();
+    emit faultCodesClearSuccess();
   }
 }
 
@@ -50,20 +82,9 @@ void MEMSInterface::onFaultCodesClearRequested()
  */
 void MEMSInterface::onResetAdjustmentsRequested()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (requireConnection())
   {
-    if (mems_reset_adjustments(&m_memsinfo))
-    {
-      // emit adjustmentsResetSuccess();
-    }
-    else
-    {
-      emit errorSendingCommand();
-    }
-  }
-  else
-  {
-    emit notConnected();
+    reportCommandResult(mems_reset_adjustments(&m_memsinfo));
   }
 }
 
@@ -72,20 +93,9 @@ void MEMSInterface::onResetAdjustmentsRequested()
  */
 void MEMSInterface::onResetECURequested()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (requireConnection() && reportCommandResult(mems_reset_ECU(&m_memsinfo)))
   {
-    if (mems_reset_ECU(&m_memsinfo))
-    {
-      emit ECUResetSuccess();
-    }
-    else
-    {
-      emit errorSendingCommand();
-    }
-  }
-  else
-  {
-    emit notConnected();
+    emit ECUResetSuccess();
   }
 }
 
@@ -94,16 +104,9 @@ void MEMSInterface::onResetECURequested()
  */
 void MEMSInterface::onIdleAirControlMovementRequest(int desiredPos)
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (requireConnection())
   {
-    if (!mems_move_iac(&m_memsinfo, desiredPos))
-    {
-      emit errorSendingCommand();
-    }
-  }
-  else
-  {
-    emit notConnected();
+    reportCommandResult(mems_move_iac(&m_memsinfo, desiredPos));
   }
 
   emit moveIACComplete();
@@ -238,30 +241,23 @@ void MEMSInterface::runServiceLoop()
   }
 }
 
+/**
+ * Switches an actuator on, waits briefly, and switches it back off.
+ * @return True if both commands were sent successfully; false otherwise.
+ */
 bool MEMSInterface::actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd)
 {
   bool status = false;
-  void sleep();
 
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+  if (requireConnection())
   {
     if (mems_test_actuator(&m_memsinfo, onCmd, NULL))
-		QThread::sleep(1);
     {
-      if (mems_test_actuator(&m_memsinfo, offCmd, NULL))
-      {
-        status = true;
-      }
+      QThread::sleep(1);
+      status = mems_test_actuator(&m_memsinfo, offCmd, NULL);
     }
 
-    if (!status)
-    {
-      emit errorSendingCommand();
-    }
-  }
-  else
-  {
-    emit notConnected();
+    reportCommandResult(status);
   }
 
   return status;
@@ -323,354 +319,163 @@ void MEMSInterface::on_m_Fan3_TestButton_clicked()
 
 void MEMSInterface::onFuelPumpOn()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_FuelPumpOn, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_FuelPumpOn);
 }
 
 void MEMSInterface::onFuelPumpOff()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_FuelPumpOff, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_FuelPumpOff);
 }
 
 void MEMSInterface::onPTCRelayOn()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_PTCRelayOn, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_PTCRelayOn);
 }
 
 void MEMSInterface::onPTCRelayOff()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_PTCRelayOff, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_PTCRelayOff);
 }
 
 void MEMSInterface::onACRelayOn()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_ACRelayOn, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_ACRelayOn);
 }
 
 void MEMSInterface::onACRelayOff()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_ACRelayOff, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_ACRelayOff);
 }
 
 void MEMSInterface::onIgnitionCoilTest()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_FireCoil, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_FireCoil);
 }
 
 void MEMSInterface::onFuelInjectorTest()
 {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
-  {
-    if (!mems_test_actuator(&m_memsinfo, MEMS_TestInjectors, NULL))
-    {
-      emit errorSendingCommand();
-    }
-  }
+  sendActuatorCommand(MEMS_TestInjectors);
 }
+
 void MEMSInterface::on_m_fuel_trim_plusButton_clicked()
 {
- if (m_initComplete && mems_is_connected(&m_memsinfo))
- {
-     if (!mems_test_actuator(&m_memsinfo,MEMS_FuelTrimPlus,NULL))
-     {
-       emit errorSendingCommand();
-     }
+  sendActuatorCommand(MEMS_FuelTrimPlus);
 }
 
+void MEMSInterface::on_m_fuel_trim_minusButton_clicked()
+{
+  sendActuatorCommand(MEMS_FuelTrimMinus);
 }
 
- void MEMSInterface::on_m_fuel_trim_minusButton_clicked()
- {
-  if (m_initComplete && mems_is_connected(&m_memsinfo))
+void MEMSInterface::on_m_idle_decay_plusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IdleDecayPlus);
+}
+
+void MEMSInterface::on_m_idle_decay_minusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IdleDecayMinus);
+}
+
+void MEMSInterface::on_m_idle_speed_plusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IdleSpeedPlus);
+}
+
+void MEMSInterface::on_m_idle_speed_minusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IdleSpeedMinus);
+}
+
+void MEMSInterface::on_m_ignition_advance_plusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IgnitionAdvancePlus);
+}
+
+void MEMSInterface::on_m_ignition_advance_minusButton_clicked()
+{
+  sendActuatorCommand(MEMS_IgnitionAdvanceMinus);
+}
+
+void MEMSInterface::on_m_Purge_Valve_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_PurgeValveOn);
+}
+
+void MEMSInterface::on_m_Purge_Valve_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_PurgeValveOff);
+}
+
+void MEMSInterface::on_m_O2Heater_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_O2HeaterOn);
+}
+
+void MEMSInterface::on_m_O2Heater_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_O2HeaterOff);
+}
+
+void MEMSInterface::on_m_Boost_Valve_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_BoostValveOn);
+}
+
+void MEMSInterface::on_m_Boost_Valve_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_BoostValveOff);
+}
+
+void MEMSInterface::on_m_Fan1_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan1On);
+}
+
+void MEMSInterface::on_m_Fan2_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan2On);
+}
+
+void MEMSInterface::on_m_Fan3_OnButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan3On);
+}
+
+void MEMSInterface::on_m_Fan1_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan1Off);
+}
+
+void MEMSInterface::on_m_Fan2_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan2Off);
+}
+
+void MEMSInterface::on_m_Fan3_OffButton_clicked()
+{
+  sendActuatorCommand(MEMS_Fan3Off);
+}
+
+void MEMSInterface::on_m_IACMinusButton_clicked()
+{
+  sendActuatorCommand(MEMS_CloseIAC);
+}
+
+void MEMSInterface::on_m_IACPlusButton_clicked()
+{
+  sendActuatorCommand(MEMS_OpenIAC);
+}
+
+void MEMSInterface::on_m_AllActuatorsOffButton_clicked()
+{
+  sendActuatorCommand(MEMS_AllActuatorsOff);
+}
+
+void MEMSInterface::on_interactive_push_button_clicked()
+{
+  if (isConnected())
   {
-      if (!mems_test_actuator(&m_memsinfo, MEMS_FuelTrimMinus, NULL))
-      {
-        emit errorSendingCommand();
-      }
- }
- }
-
-  void MEMSInterface::on_m_idle_decay_plusButton_clicked()
-  {
-   if (m_initComplete && mems_is_connected(&m_memsinfo))
-   {
-       if (!mems_test_actuator(&m_memsinfo,MEMS_IdleDecayPlus, NULL))
-       {
-         emit errorSendingCommand();
-       }
+    emit errorSendingCommand();
   }
-  }
-
-    void MEMSInterface::on_m_idle_decay_minusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_IdleDecayMinus, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-
-    void MEMSInterface::on_m_idle_speed_plusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_IdleSpeedPlus, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-
-    void MEMSInterface::on_m_idle_speed_minusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_IdleSpeedMinus, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_ignition_advance_plusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_IgnitionAdvancePlus, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_ignition_advance_minusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_IgnitionAdvanceMinus, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-
-//mems_Purge_Valve_On(mems_info* info, uint8_t* data)
-    void MEMSInterface::on_m_Purge_Valve_OnButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_PurgeValveOn, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_Purge_Valve_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_PurgeValveOff, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_O2Heater_OnButton_clicked()
-    {
-		// void sleep();
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-		if (!mems_test_actuator(&m_memsinfo,MEMS_O2HeaterOn, NULL))
-         {
-           emit errorSendingCommand();
-         }
-		/*  else 
-		 {
-			 QThread::sleep(5);
-			 emit turnO2HeaterOff();
-		 } */
-		 /* if (mems_test_actuator(&m_memsinfo,MEMS_O2HeaterOn, NULL))
-		 {
-			 QThread::sleep(2);
-			 emit turnO2HeaterOff();
-		 } */
-		  
-    }
-    }
-    void MEMSInterface::on_m_O2Heater_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_O2HeaterOff, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_Boost_Valve_OnButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_BoostValveOn, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	void MEMSInterface::on_m_Boost_Valve_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_BoostValveOff, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_Fan1_OnButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan1On, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_Fan2_OnButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan2On, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	void MEMSInterface::on_m_Fan3_OnButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan3On, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-
-    void MEMSInterface::on_m_Fan1_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan1Off, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-    void MEMSInterface::on_m_Fan2_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan2Off, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	void MEMSInterface::on_m_Fan3_OffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_Fan3Off, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	
-	void MEMSInterface::on_m_IACMinusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_CloseIAC, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	void MEMSInterface::on_m_IACPlusButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_OpenIAC, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-	
-	void MEMSInterface::on_m_AllActuatorsOffButton_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-         if (!mems_test_actuator(&m_memsinfo,MEMS_AllActuatorsOff, NULL))
-         {
-           emit errorSendingCommand();
-         }
-    }
-    }
-
-    void MEMSInterface::on_interactive_push_button_clicked()
-    {
-     if (m_initComplete && mems_is_connected(&m_memsinfo))
-     {
-
-
-           emit errorSendingCommand();
-
-    }
-    }
-
-
+}

@@ -123,6 +123,9 @@ private:
     uint8_t m_d0_response_buffer[4];
     void runServiceLoop();
     bool connectToECU();
+    bool requireConnection();
+    bool reportCommandResult(bool commandSucceeded);
+    bool sendActuatorCommand(actuator_cmd cmd);
     bool actuatorOnOffDelayTest(actuator_cmd onCmd, actuator_cmd offCmd);
 };
 
